@@ -1,5 +1,7 @@
 param(
     [string]$Agents = "claude-code,vscode-copilot",
+    [string]$Components = "context7,engram,sdd,skills,persona,permissions,gga,theme",
+    [string]$Persona = "gentleman",
     [switch]$DryRun,
     [switch]$Apply,
     [switch]$EnableGga
@@ -24,7 +26,8 @@ if ($DryRun) {
 $mode = if ($Apply) { "apply" } else { "dry-run" }
 Write-Host "[gentle-ai] Mode: $mode"
 Write-Host "[gentle-ai] Agents: $Agents"
-Write-Host "[gentle-ai] Components: context7,engram,sdd,skills"
+Write-Host "[gentle-ai] Components: $Components"
+Write-Host "[gentle-ai] Persona: $Persona"
 
 if (-not (Get-Command gentle-ai -ErrorAction SilentlyContinue)) {
     Write-Host "[gentle-ai] CLI not found. Installing from upstream script..."
@@ -34,8 +37,8 @@ if (-not (Get-Command gentle-ai -ErrorAction SilentlyContinue)) {
 $args = @(
     "install",
     "--agent", $Agents,
-    "--component", "context7,engram,sdd,skills",
-    "--persona", "gentleman"
+    "--component", $Components,
+    "--persona", $Persona
 )
 
 if ($useDryRun) {
@@ -57,6 +60,9 @@ if (-not $useDryRun -and $EnableGga) {
     }
     Write-Host "[gentle-ai] Enabling GGA in this repository via Git Bash..."
     & $bashPath -lc "cd '$repoUnix' && bash platform/gentle_ai/runbooks/GIT_BASH_enable_gga.sh"
+
+    $ggaHealth = (& $bashPath -lc "command -v gga >/dev/null 2>&1 && gga version || echo 'gga missing'").Trim()
+    Write-Host "[gentle-ai] GGA health: $ggaHealth"
 }
 
 Write-Host ""

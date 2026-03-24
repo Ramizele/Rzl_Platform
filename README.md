@@ -28,6 +28,8 @@ Contrato local de aplicacion:
 Mapa de template:
 - `platform/architecture/template_architecture_map.md`
 - `platform/architecture/ANALISIS_angels_repo_v0.1.md`
+- `platform/architecture/PROPOSAL_agent_teams_lite_v2_2026-03-24.md`
+- `platform/architecture/ROADMAP_route_d_staged_execution_v1.md`
 
 ## Uso rapido
 
@@ -59,4 +61,10 @@ Aplicar real:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1 -Agents "claude-code,vscode-copilot" -Apply -EnableGga
+```
+
+Verificar stack:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File platform/gentle_ai/runbooks/WINDOWS_verify_gentle_ai_stack.ps1
 ```

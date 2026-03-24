@@ -1,6 +1,6 @@
 manifest_id: gentle_ai_template_control_plane
 version: v0.1
-status: draft
+status: active
 updated: 2026-03-24
 
 source_of_truth:
@@ -44,6 +44,7 @@ presets:
 
 runbooks:
   windows_bootstrap: platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1
+  windows_verify: platform/gentle_ai/runbooks/WINDOWS_verify_gentle_ai_stack.ps1
   gga_project_enable: platform/gentle_ai/runbooks/GIT_BASH_enable_gga.sh
   windows_note: "On Windows, GGA activation is executed in Git Bash after ecosystem install."
 
