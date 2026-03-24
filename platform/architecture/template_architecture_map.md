@@ -2,22 +2,25 @@
 
 ## Objetivo
 
-Usar una referencia externa solo como fuente de estructura para arrancar la plataforma local con el mismo enfoque:
+Usar `gentle-ai` como fuente de maxima jerarquia del ecosistema de agentes y mantener esta arquitectura local por buckets:
 - buckets claros por dominio,
 - inventario de assets por bucket,
 - orquestacion entre buckets basada en referencias de rutas.
 
-## Mapeo de referencia a implementacion local
+## Fuente jerarquica
 
-| Referencia AingZ | Implementacion local |
-| --- | --- |
-| `platform/` | `platform/` |
-| `core/` | `core/` |
-| `aingz_database/` | `rzl_database/` |
-| `aingz_persona/` | `rzl_persona/` |
-| `aingz_gpt_apps/` | `rzl_gpt_apps/` |
-| `aingz_gdrive/` | `rzl_gdrive/` |
-| `plugins/` | `plugins/` |
+- Upstream: `https://github.com/Gentleman-Programming/gentle-ai`
+- Capa local: `platform/gentle_ai/`
+
+## Buckets locales canonicos
+
+- `platform/`
+- `core/`
+- `rzl_database/`
+- `rzl_persona/`
+- `rzl_gpt_apps/`
+- `plugins/`
+- `rzl_gdrive/`
 
 ## Regla de orquestacion local
 

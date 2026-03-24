@@ -6,6 +6,15 @@ Template base para operar con:
 - assets,
 - orquestacion entre buckets por referencias cruzadas.
 
+## Fuente de maxima jerarquia
+
+Repositorio canonico de referencia para ecosistema AI:
+- `https://github.com/Gentleman-Programming/gentle-ai`
+
+Contrato local de aplicacion:
+- `platform/gentle_ai/README.md`
+- `platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml`
+
 ## Estructura local inicial
 
 - `platform/` -> herramientas, arquitectura y reportes
@@ -30,3 +39,15 @@ python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir 
 2. Revisar reportes generados:
 - `platform/reports/*/REPORT_bucket_asset_orchestration_*_latest.md`
 - `platform/reports/*/SNAPSHOT_bucket_asset_orchestration_*_latest.json`
+
+## Bootstrap Gentle AI (Windows)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1 -Agents "claude-code,vscode-copilot" -DryRun
+```
+
+Aplicar real:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1 -Agents "claude-code,vscode-copilot" -Apply -EnableGga
+```

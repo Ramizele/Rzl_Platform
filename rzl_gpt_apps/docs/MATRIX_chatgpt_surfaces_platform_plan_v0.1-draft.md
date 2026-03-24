@@ -1,4 +1,4 @@
----
+﻿---
 asset_id: "matrix_chatgpt_surfaces_platform_plan_rzl"
 asset_type: "matrix"
 status: "draft"
@@ -27,10 +27,18 @@ Definir que superficie usar segun plataforma y tipo de trabajo, para mantener co
 | `codex_local` | Codex en repo local | yes | no | yes | cambios de codigo, scripts y validaciones |
 | `openai_api` | API OpenAI | yes | yes | yes | automatizaciones y orquestacion programatica |
 
+## Capa de ecosistema (coding agents)
+
+- Fuente de jerarquia maxima: `https://github.com/Gentleman-Programming/gentle-ai`
+- Control plane local:
+  - `platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml`
+  - `platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1`
+
 ## Regla de sincronizacion
 
-1. Diseñar el flujo en `platform/` y documentar dependencias.
+1. Disenar el flujo en `platform/` y documentar dependencias.
 2. Ejecutar cambios en repo local con Codex/VSCode.
 3. Publicar contexto operativo sintetizado en la superficie ChatGPT correspondiente.
-4. Revalidar relaciones entre buckets con:
-   - `python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/reports/local --tag local_platform`
+4. Aplicar o actualizar ecosistema de agentes con `gentle-ai` (preset recomendado: `ecosystem-only`).
+5. Revalidar relaciones entre buckets con:
+   - `python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/reports/local --tag baseline`

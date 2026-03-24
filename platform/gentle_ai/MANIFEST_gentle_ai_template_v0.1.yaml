@@ -1,0 +1,59 @@
+manifest_id: gentle_ai_template_control_plane
+version: v0.1
+status: draft
+updated: 2026-03-24
+
+source_of_truth:
+  repo_url: https://github.com/Gentleman-Programming/gentle-ai
+  branch: main
+  hierarchy: maximum
+  mode: template_only
+
+strategy:
+  objective: "Apply gentle-ai ecosystem without importing foreign operational data."
+  apply_style: "upstream_contract_plus_local_adaptation"
+  sync_policy: "pull_upstream_changes_then_reconcile_local_runbooks"
+
+agents:
+  supported:
+    - claude-code
+    - opencode
+    - gemini-cli
+    - cursor
+    - vscode-copilot
+  windows_default:
+    - claude-code
+    - vscode-copilot
+
+components:
+  - engram
+  - sdd
+  - skills
+  - context7
+  - persona
+  - permissions
+  - gga
+  - theme
+
+presets:
+  default: ecosystem-only
+  alternatives:
+    - full-gentleman
+    - minimal
+    - custom
+
+runbooks:
+  windows_bootstrap: platform/gentle_ai/runbooks/WINDOWS_bootstrap_gentle_ai.ps1
+  gga_project_enable: platform/gentle_ai/runbooks/GIT_BASH_enable_gga.sh
+  windows_note: "On Windows, GGA activation is executed in Git Bash after ecosystem install."
+
+governance:
+  local_template_map: platform/architecture/template_architecture_map.md
+  local_buckets:
+    - platform
+    - core
+    - rzl_database
+    - rzl_persona
+    - rzl_gpt_apps
+    - plugins
+    - rzl_gdrive
