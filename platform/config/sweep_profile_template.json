@@ -1,0 +1,46 @@
+{
+  "excluded_dirs": [
+    ".git",
+    "__pycache__",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "node_modules",
+    ".obsidian"
+  ],
+  "text_extensions": [
+    ".md",
+    ".txt",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".ini",
+    ".py",
+    ".ps1",
+    ".sh",
+    ".bat",
+    ".cfg",
+    ".conf"
+  ],
+  "primary_buckets": [
+    "platform",
+    "core",
+    "rzl_database",
+    "rzl_gpt_apps",
+    "rzl_persona",
+    "plugins",
+    "rzl_gdrive"
+  ],
+  "bucket_aliases": {
+    "aingz_database": "rzl_database",
+    "aingz_gpt_apps": "rzl_gpt_apps",
+    "aingz_persona": "rzl_persona",
+    "aingz_gdrive": "rzl_gdrive",
+    "inventory": "rzl_database",
+    "main": "rzl_database",
+    "main_2": "rzl_database"
+  }
+}
