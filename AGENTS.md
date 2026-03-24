@@ -15,3 +15,5 @@
    - `.gga` (project-level execution policy for GGA hooks)
 4. Keep bucket architecture aligned with:
    - `platform/architecture/maps/template_architecture_map.md`
+5. All projects in this platform must be built and operated using `gentle-ai` stack/ecosystem as the maximum hierarchy for daily interaction.
+6. Daily interaction must use all applicable `gentle-ai` systems and modes (agents, components, runbooks and governance checks), unless a runbook explicitly declares a scoped exception.

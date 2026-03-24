@@ -50,6 +50,10 @@ runbooks:
 
 governance:
   local_template_map: platform/architecture/template_architecture_map.md
+  mandatory_daily_interaction:
+    stack_hierarchy: gentle_ai_maximum
+    requirement: "All projects must use gentle-ai stack/ecosystem as the default daily interaction framework."
+    systems_and_modes_policy: "Use all applicable systems and modes in daily operation unless a runbook defines a scoped exception."
   local_buckets:
     - platform
     - core

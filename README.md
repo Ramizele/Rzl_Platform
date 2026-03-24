@@ -15,6 +15,11 @@ Contrato local de aplicacion:
 - `platform/gentle_ai/README.md`
 - `platform/gentle_ai/manifests/MANIFEST_gentle_ai_template_v0.1.yaml`
 
+## Politica transversal de proyectos
+
+- Todos los proyectos que nazcan y operen en `Rzl_Platform` deben usar `gentle-ai` stack/ecosistema como plataforma de maxima jerarquia para la interaccion diaria.
+- La interaccion diaria debe usar todos los sistemas y modos aplicables del stack, salvo excepcion puntual documentada en runbook.
+
 ## Estructura local inicial
 
 - `platform/` -> herramientas, arquitectura y reportes

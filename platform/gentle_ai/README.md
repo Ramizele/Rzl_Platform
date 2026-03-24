@@ -8,6 +8,11 @@ Este directorio aplica el ecosistema `gentle-ai` sobre este repositorio usando m
 2. Este repo define solo adaptaciones locales (rutas, buckets, runbooks de ejecucion).
 3. Si hay conflicto, prevalece upstream y se ajusta la capa local.
 
+## Politica diaria obligatoria
+
+- Todos los proyectos de `Rzl_Platform` deben operar usando `gentle-ai` stack/ecosistema como marco de maxima jerarquia en la interaccion diaria.
+- En la operacion diaria se deben usar todos los sistemas y modos aplicables del stack (`agents`, `components`, `runbooks`, `governance checks`), salvo excepcion acotada declarada en un runbook.
+
 ## Alcance local
 
 - Estandarizar setup de agentes (`claude-code`, `vscode-copilot`, `opencode`, `gemini-cli`, `cursor`).
