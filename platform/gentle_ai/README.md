@@ -16,7 +16,7 @@ Este directorio aplica el ecosistema `gentle-ai` sobre este repositorio usando m
 
 ## Artefactos
 
-- `MANIFEST_gentle_ai_template_v0.1.yaml`: contrato operativo local.
+- `manifests/MANIFEST_gentle_ai_template_v0.1.yaml`: contrato operativo local.
 - `runbooks/WINDOWS_bootstrap_gentle_ai.ps1`: bootstrap y aplicacion del preset.
 - `runbooks/WINDOWS_verify_gentle_ai_stack.ps1`: verificacion de stack en Windows (`gentle-ai`, `engram`, `gga`).
 - `runbooks/GIT_BASH_enable_gga.sh`: activacion de GGA por proyecto.

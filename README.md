@@ -13,7 +13,7 @@ Repositorio canonico de referencia para ecosistema AI:
 
 Contrato local de aplicacion:
 - `platform/gentle_ai/README.md`
-- `platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml`
+- `platform/gentle_ai/manifests/MANIFEST_gentle_ai_template_v0.1.yaml`
 
 ## Estructura local inicial
 
@@ -26,30 +26,30 @@ Contrato local de aplicacion:
 - `rzl_gdrive/` -> payload pesado
 
 Mapa de template:
-- `platform/architecture/template_architecture_map.md`
-- `platform/architecture/ANALISIS_angels_repo_v0.1.md`
-- `platform/architecture/PROPOSAL_agent_teams_lite_v2_2026-03-24.md`
-- `platform/architecture/ROADMAP_route_d_staged_execution_v1.md`
+- `platform/architecture/maps/template_architecture_map.md`
+- `platform/architecture/maps/ANALISIS_angels_repo_v0.1.md`
+- `platform/architecture/adrs/PROPOSAL_agent_teams_lite_v2_2026-03-24.md`
+- `platform/architecture/roadmaps/ROADMAP_route_d_staged_execution_v1.md`
 
 ## Uso rapido
 
 1. Ejecutar barrido sobre este repo local:
 
 ```powershell
-python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/reports/local --tag baseline
+python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/ops/reports/sweeps --tag baseline
 ```
 
 2. Revisar reportes generados:
-- `platform/reports/*/REPORT_bucket_asset_orchestration_*_latest.md`
-- `platform/reports/*/SNAPSHOT_bucket_asset_orchestration_*_latest.json`
+- `platform/ops/reports/sweeps/REPORT_bucket_asset_orchestration_*_latest.md`
+- `platform/ops/reports/sweeps/SNAPSHOT_bucket_asset_orchestration_*_latest.json`
 
 ## Arquitectura operativa v1 (inicio)
 
 - `platform/governance/` -> reglas, manifiestos y contratos
 - `platform/ops/` -> runbooks, workbenches y checks
-- `rzl_database/systems/Sys_Template/` -> template base de sistema
+- `rzl_database/systems/_template/` -> template base de sistema
 - `rzl_gpt_apps/packs/` -> empaquetado para superficies/agentes
-- `plugins/apps/extensiones/` -> integraciones por caso de uso
+- `plugins/apps/extensions/` -> integraciones por caso de uso
 
 ## Bootstrap Gentle AI (Windows)
 

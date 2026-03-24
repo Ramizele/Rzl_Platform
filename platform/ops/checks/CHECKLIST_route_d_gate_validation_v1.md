@@ -24,7 +24,7 @@ engram stats
 3. Architecture sweep:
 
 ```powershell
-python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/reports/local --tag route_d_gate_check
+python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/ops/reports/sweeps --tag route_d_gate_check
 ```
 
 4. Full gate validator:

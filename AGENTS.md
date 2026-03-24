@@ -10,8 +10,8 @@
 1. Use `gentle-ai` contracts for agents/components/presets as default source of truth.
 2. Keep this repository in template mode (no imported operational data from external repos).
 3. Apply local adaptations only through:
-   - `platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml`
+   - `platform/gentle_ai/manifests/MANIFEST_gentle_ai_template_v0.1.yaml`
    - `platform/gentle_ai/runbooks/*`
    - `.gga` (project-level execution policy for GGA hooks)
 4. Keep bucket architecture aligned with:
-   - `platform/architecture/template_architecture_map.md`
+   - `platform/architecture/maps/template_architecture_map.md`

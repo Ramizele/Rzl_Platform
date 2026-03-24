@@ -401,10 +401,10 @@ def _render_report(
 def run() -> int:
     parser = argparse.ArgumentParser(description="Sweep buckets, assets and cross-bucket orchestration references.")
     parser.add_argument("--root", default=".", help="Filesystem root to scan.")
-    parser.add_argument("--output-dir", default="platform/reports/sweeps", help="Directory where report+snapshot are written.")
+    parser.add_argument("--output-dir", default="platform/ops/reports/sweeps", help="Directory where report+snapshot are written.")
     parser.add_argument(
         "--profile",
-        default="platform/config/sweep_profile_template.json",
+        default="platform/schemas/sweep_profile_template.json",
         help="Optional JSON profile with aliases, exclusions and primary buckets.",
     )
     parser.add_argument("--tag", default="", help="Output tag. Defaults to scanned root folder name.")

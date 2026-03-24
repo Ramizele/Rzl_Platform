@@ -69,15 +69,15 @@ foreach ($bucket in $canonicalBuckets) {
     Add-Result -Gate "G1" -Check "bucket '$bucket' exists" -Pass $ok -Evidence ($(if ($ok) { "ok" } else { "missing" }))
 }
 
-$manifestPath = "platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml"
+$manifestPath = "platform/gentle_ai/manifests/MANIFEST_gentle_ai_template_v0.1.yaml"
 $manifestOk = Test-RepoPath $manifestPath
 Add-Result -Gate "G1" -Check "manifest present" -Pass $manifestOk -Evidence $manifestPath
 
 # G2 - Design Frozen
 $g2Artifacts = @(
-    "platform/architecture/ROADMAP_route_d_staged_execution_v1.md",
+    "platform/architecture/roadmaps/ROADMAP_route_d_staged_execution_v1.md",
     "platform/governance/rules/RULESET_route_d_phase_gates_v1.md",
-    "platform/governance/agents/CONTRACT_agent_teams_lite_v1.md",
+    "platform/governance/contracts/CONTRACT_agent_teams_lite_v1.md",
     "platform/ops/checks/CHECKLIST_route_d_gate_validation_v1.md"
 )
 foreach ($artifact in $g2Artifacts) {
@@ -128,7 +128,7 @@ if (Test-Path $bashPath) {
 
 if (-not $SkipSweep) {
     try {
-        $sweepOutput = python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/reports/local --tag route_d_g4 2>&1
+        $sweepOutput = python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir platform/ops/reports/sweeps --tag route_d_g4 2>&1
         Add-Result -Gate "G4" -Check "bucket sweep command" -Pass ($LASTEXITCODE -eq 0) -Evidence (($sweepOutput | Select-Object -Last 1) -join " ")
     } catch {
         Add-Result -Gate "G4" -Check "bucket sweep command" -Pass $false -Evidence $_.Exception.Message
