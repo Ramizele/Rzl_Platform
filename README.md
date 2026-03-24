@@ -27,6 +27,7 @@ Contrato local de aplicacion:
 
 Mapa de template:
 - `platform/architecture/template_architecture_map.md`
+- `platform/architecture/ANALISIS_angels_repo_v0.1.md`
 
 ## Uso rapido
 
@@ -39,6 +40,14 @@ python platform/tools/bucket_asset_orchestration_sweep.py --root . --output-dir 
 2. Revisar reportes generados:
 - `platform/reports/*/REPORT_bucket_asset_orchestration_*_latest.md`
 - `platform/reports/*/SNAPSHOT_bucket_asset_orchestration_*_latest.json`
+
+## Arquitectura operativa v1 (inicio)
+
+- `platform/governance/` -> reglas, manifiestos y contratos
+- `platform/ops/` -> runbooks, workbenches y checks
+- `rzl_database/systems/Sys_Template/` -> template base de sistema
+- `rzl_gpt_apps/packs/` -> empaquetado para superficies/agentes
+- `plugins/apps/extensiones/` -> integraciones por caso de uso
 
 ## Bootstrap Gentle AI (Windows)
 

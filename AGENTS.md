@@ -12,5 +12,6 @@
 3. Apply local adaptations only through:
    - `platform/gentle_ai/MANIFEST_gentle_ai_template_v0.1.yaml`
    - `platform/gentle_ai/runbooks/*`
+   - `.gga` (project-level execution policy for GGA hooks)
 4. Keep bucket architecture aligned with:
    - `platform/architecture/template_architecture_map.md`

@@ -19,3 +19,13 @@ Este directorio aplica el ecosistema `gentle-ai` sobre este repositorio usando m
 - `MANIFEST_gentle_ai_template_v0.1.yaml`: contrato operativo local.
 - `runbooks/WINDOWS_bootstrap_gentle_ai.ps1`: bootstrap y aplicacion del preset.
 - `runbooks/GIT_BASH_enable_gga.sh`: activacion de GGA por proyecto.
+- `.gga`: politica de ejecucion de GGA para este repositorio.
+
+## Nota Windows + Codex (GGA)
+
+En este entorno, `gga` con provider `codex` puede devolver respuesta valida pero sin el formato
+estricto esperado por `STRICT_MODE=true`. Por eso este repo usa:
+- `PROVIDER="codex"`
+- `STRICT_MODE="false"`
+
+Resultado: el hook no bloquea por parseo ambiguo, pero sigue mostrando findings para revision.
