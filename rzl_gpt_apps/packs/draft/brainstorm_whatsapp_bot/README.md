@@ -37,5 +37,5 @@ Al finalizar los 3 pasos tenés:
 ## Plataforma
 
 - Registry: `rzl_database/systems/whatsapp_bot/`
-- Workspace: `projects/whatsapp_bot/`
+- Workspace: `whatsapp_bot/`
 - Mover a `packs/released/` cuando el bot esté en producción

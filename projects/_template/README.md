@@ -1,6 +1,6 @@
 # {nombre-proyecto}
 
-> Copia este template a `projects/{nombre-proyecto}/` al iniciar un nuevo proyecto.
+> Copia este template a `{nombre-proyecto}/` en la raíz del repo al iniciar un nuevo proyecto.
 > Reemplazar todo lo que esté entre `{}`.
 
 ## Descripción

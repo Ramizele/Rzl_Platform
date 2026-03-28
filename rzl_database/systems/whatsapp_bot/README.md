@@ -10,7 +10,7 @@ Registro de plataforma para el proyecto whatsapp_bot.
 | `status` | `draft` |
 | `created` | 2026-03-28 |
 | `owner` | Rzl_Platform |
-| `workspace` | `projects/whatsapp_bot/` |
+| `workspace` | `whatsapp_bot/` |
 | `pack` | `rzl_gpt_apps/packs/draft/brainstorm_whatsapp_bot/` |
 
 ## Descripción
