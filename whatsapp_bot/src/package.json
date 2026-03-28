@@ -1,0 +1,19 @@
+{
+  "name": "baba-bot",
+  "version": "1.0.0",
+  "description": "Bot de WhatsApp para Baba — lee destinatarios y templates desde Google Sheets",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js --test"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "googleapis": "^140.0.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

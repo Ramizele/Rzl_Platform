@@ -21,6 +21,7 @@ Usar `gentle-ai` como fuente de maxima jerarquia del ecosistema de agentes y man
 - `rzl_gpt_apps/`
 - `plugins/`
 - `rzl_gdrive/`
+- `{nombre_proyecto}/` — cada proyecto vive como bucket raíz (ej: `whatsapp_bot/`)
 
 ## Regla de orquestacion local
 
@@ -29,6 +30,19 @@ Usar `gentle-ai` como fuente de maxima jerarquia del ecosistema de agentes y man
 3. `rzl_gpt_apps/` traduce el trabajo a superficies ChatGPT (Windows/iOS/Web/Projects/GPTs).
 4. `plugins/` integra automatizaciones externas.
 5. `core/` mantiene componentes base compartidos.
+6. Cada proyecto vive como carpeta raíz junto a los buckets de plataforma (ej: `whatsapp_bot/`). Contiene el trabajo propio del proyecto (código, docs, worklog, assets) separado de la infraestructura.
+
+## Modelo de dos capas por proyecto
+
+Cada proyecto tiene presencia en dos capas:
+
+| Capa | Bucket | Contenido |
+|------|--------|-----------|
+| Plataforma | `rzl_database/systems/{name}/` | Registry, metadata, knowledge base |
+| Plataforma | `rzl_gpt_apps/packs/draft/{name}/` | Packs y superficies ChatGPT |
+| Proyecto | `{name}/` (raíz del repo) | Código, docs, worklog, assets del proyecto |
+
+Ver convención completa: `platform/governance/standards/CONVENTION_project_workspace_v1.md`
 
 ## Ciclo operativo minimo
 
