@@ -1,0 +1,265 @@
+# config/fields.yaml
+# Baba Prospector — Configuración central de campos
+#
+# Este archivo es la única fuente de verdad para:
+#   - Qué campos se capturan
+#   - Su prioridad (clave / recomendado / util / opcional)
+#   - Cómo se muestran al vendedor
+#   - Valores permitidos (para campos cerrados)
+#   - Reglas de inferencia automática
+#
+# Para agregar un campo nuevo: agregalo acá y el bot lo maneja automáticamente.
+# Para cambiar una prioridad: cambiá el valor de `priority`.
+# Para agregar una marca a un segmento: agregala en `segments` más abajo.
+
+# ─────────────────────────────────────────────
+# CAMPOS DEL BAR
+# Orden dentro de cada grupo = orden de display en el resumen
+# ─────────────────────────────────────────────
+
+fields:
+
+  # ── CLAVE ──────────────────────────────────
+  # El bot pregunta activamente si faltan, en el orden definido por ask_priority
+
+  - key: nombre
+    label: "Nombre del bar"
+    priority: clave
+    ask_priority: 1
+    type: string
+
+  - key: direccion
+    label: "Dirección"
+    priority: clave
+    ask_priority: 2
+    type: string
+
+  - key: barrio
+    label: "Barrio"
+    priority: clave
+    ask_priority: 2          # mismo nivel que dirección, se capturan juntos
+    type: string
+
+  # ── RECOMENDADO ────────────────────────────
+  # El bot pregunta activamente si faltan, después de los CLAVE
+
+  - key: segmento_inferido
+    label: "Segmento de birra"
+    priority: recomendado
+    ask_priority: 3
+    type: enum
+    options: ["art_alto", "art_medio", "art_economico", "industrial", "mixto"]
+    infer_from_brands: true   # se infiere automáticamente según marcas mencionadas
+    confirm_inference: true   # después de inferir, el bot pide confirmación
+
+  - key: segmento_confirmado
+    label: "Segmento confirmado"
+    priority: recomendado
+    ask_priority: 3
+    type: enum
+    options: ["art_alto", "art_medio", "art_economico", "industrial", "mixto"]
+    note: "Se completa cuando el vendedor confirma o corrige el segmento inferido"
+
+  - key: formato_venta
+    label: "Formato de venta"
+    priority: recomendado
+    ask_priority: 4
+    type: enum
+    options: ["Tirada", "Lata", "Ambos"]
+    aliases:
+      Tirada: ["canilla", "chopera", "tirador", "grifo", "tirada"]
+      Lata: ["lata", "latas", "en lata"]
+
+  - key: canillas_totales
+    label: "Canillas totales del bar"
+    priority: recomendado
+    ask_priority: 5
+    type: integer
+    note: "Total de todas las marcas, no solo las disponibles para Baba"
+
+  - key: contacto_nombre
+    label: "Nombre del contacto"
+    priority: recomendado
+    ask_priority: 6
+    type: string
+
+  - key: contacto_cargo
+    label: "Cargo del contacto"
+    priority: recomendado
+    ask_priority: 6           # mismo nivel que nombre, se capturan juntos
+    type: string
+    aliases:
+      encargado: ["encargado", "el que maneja", "el chabón", "el dueño", "dueño"]
+      gerente: ["gerente", "manager"]
+      compras: ["encargado de compras", "el de compras", "comprador"]
+
+  - key: contacto_telefono
+    label: "Teléfono del contacto"
+    priority: recomendado
+    ask_priority: 7
+    type: string
+
+  - key: contacto_instagram
+    label: "Instagram del contacto"
+    priority: recomendado
+    ask_priority: 7           # mismo nivel que teléfono, cualquiera de los dos alcanza
+    type: string
+
+  # ── ÚTIL ───────────────────────────────────
+  # El bot notifica si faltan en el resumen, pero NO pregunta activamente
+
+  - key: birras_actuales_marcas
+    label: "Birras actuales (marcas)"
+    priority: util
+    type: string
+    note: "Lista de marcas mencionadas, separadas por coma. Se usa para inferir segmento."
+
+  - key: interes_encargado
+    label: "Interés del encargado"
+    priority: util
+    type: enum
+    options: ["receptivo", "indiferente", "negativo"]
+    aliases:
+      receptivo: ["re copado", "buena onda", "le copó", "interesado", "copado", "piola", "dale", "quiere saber más"]
+      indiferente: ["ni fu ni fa", "más o menos", "no le interesó mucho", "dudoso", "veremos"]
+      negativo: ["no quiso saber nada", "nos mandó a cagar", "no le interesó", "no gracias", "ya tienen"]
+
+  - key: historial_baba
+    label: "Historial con Baba"
+    priority: util
+    type: enum
+    options: ["sin_historial", "ex_cliente", "cliente_activo", "en_negociacion"]
+    aliases:
+      ex_cliente: ["ya nos habían comprado", "eran clientes", "compraban antes", "dejaron de comprar"]
+      cliente_activo: ["ya nos compran", "son clientes", "cliente nuestro"]
+      en_negociacion: ["están viendo", "lo están pensando", "en charla"]
+      sin_historial: ["nunca compraron", "primera vez", "no nos conocían"]
+
+  - key: como_ingreso_prospecto
+    label: "Cómo ingresó el prospecto"
+    priority: util
+    type: string
+    default: "visita_en_frio"
+    note: "Por ahora casi siempre es visita en frío. Se puede extender con referidos, eventos, etc."
+
+  # ── OPCIONAL ───────────────────────────────
+  # Se captura solo si el vendedor lo menciona. El bot no avisa ni pregunta.
+
+  - key: horarios
+    label: "Horarios de atención"
+    priority: opcional
+    type: string
+
+  - key: capacidad
+    label: "Capacidad (personas)"
+    priority: opcional
+    type: integer
+
+  - key: estilo_local
+    label: "Estilo / Público objetivo"
+    priority: opcional
+    type: string
+    note: "Ej: bar de barrio, estudiantes, after office, turistas, etc."
+
+  # ── SIEMPRE ────────────────────────────────
+  # Siempre se captura si el vendedor menciona algo fuera de los campos anteriores
+
+  - key: comentarios
+    label: "Notas extra"
+    priority: siempre
+    type: string
+    note: "Cualquier observación libre del vendedor que no entre en los campos anteriores"
+
+  # ── METADATA ───────────────────────────────
+  # Campos que el bot completa automáticamente, el vendedor no los dice
+
+  - key: estado
+    label: "Estado del prospecto"
+    priority: metadata
+    type: enum
+    options: ["prospecto", "contactado", "en_negociacion", "no_interesado", "revisar"]
+    default: "prospecto"
+    note: "Se actualiza manualmente desde Sheets o con comandos futuros del bot"
+
+  - key: fecha_visita
+    label: "Fecha de visita"
+    priority: metadata
+    type: date
+    auto: true
+    note: "Se completa automáticamente al registrar el bar"
+
+  - key: id
+    label: "ID"
+    priority: metadata
+    type: string
+    auto: true
+    note: "Timestamp Unix al momento de guardar"
+
+# ─────────────────────────────────────────────
+# SEGMENTOS DE BIRRA
+# Para agregar una marca nueva: agregala a la lista correspondiente
+# Para crear un segmento nuevo: agregá una entrada nueva acá
+# ─────────────────────────────────────────────
+
+segments:
+  art_alto:
+    label: "Artesanal alto"
+    description: "Craft independiente premium"
+    brands: ["Baba", "Mur", "Minga", "Jabalina"]
+
+  art_medio:
+    label: "Artesanal medio"
+    description: "Craft de alcance medio"
+    brands: ["Baum", "Hormiga", "Kraken", "Bierhaus", "Federal"]
+
+  art_economico:
+    label: "Artesanal económico"
+    description: "Craft de precio accesible"
+    brands: ["Gaucho", "Mula"]
+
+  industrial:
+    label: "Industrial"
+    description: "Marcas de gran escala"
+    brands: ["Quilmes", "Brahma", "Heineken", "Corona", "Stella Artois", "Budweiser", "Schneider", "Imperial"]
+
+  mixto:
+    label: "Mixto"
+    description: "Vende de más de un segmento"
+    brands: []   # se asigna automáticamente cuando hay marcas de más de un segmento
+
+# ─────────────────────────────────────────────
+# ESTADOS DEL BAR
+# ─────────────────────────────────────────────
+
+bar_states:
+  - key: prospecto
+    label: "Prospecto"
+    description: "Visitado, aún no hay seguimiento"
+    default: true
+
+  - key: contactado
+    label: "Contactado"
+    description: "Se hizo seguimiento posterior a la visita"
+
+  - key: en_negociacion
+    label: "En negociación"
+    description: "Hay una conversación activa de venta"
+
+  - key: no_interesado
+    label: "No interesado"
+    description: "Descartado por ahora"
+
+  - key: revisar
+    label: "Revisar"
+    description: "Requiere atención o seguimiento especial"
+
+# ─────────────────────────────────────────────
+# CONFIGURACIÓN DEL BOT
+# ─────────────────────────────────────────────
+
+bot:
+  close_commands: ["siguiente", "listo"]   # palabras que cierran el bar activo
+  language: "es-AR"                         # para Whisper
+  behavior: "activo"                        # activo | pasivo | hibrido
+  max_question_per_response: 1              # nunca más de una pregunta por respuesta
+  sheets_tab: "bares_prospectos"            # nombre exacto de la hoja en Sheets
