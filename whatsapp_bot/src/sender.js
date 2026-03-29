@@ -23,21 +23,23 @@ async function checkRateLimit() {
 }
 
 async function sendText(client, chatId, message) {
-  await client.sendPresenceUpdate('composing', chatId);
+  const chat = await client.getChatById(chatId);
+  await chat.sendStateTyping();
   // Delay proporcional al largo del mensaje (mín 1s, máx 4s)
   const typingMs = Math.min(message.length * 35 + Math.random() * 800, 4000);
   await sleep(typingMs);
   await client.sendMessage(chatId, message);
-  await client.sendPresenceUpdate('paused', chatId);
+  await chat.clearState();
 }
 
 async function sendImage(client, chatId, imageUrl, caption) {
   const { MessageMedia } = require('whatsapp-web.js');
   const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
-  await client.sendPresenceUpdate('composing', chatId);
+  const chat = await client.getChatById(chatId);
+  await chat.sendStateTyping();
   await sleep(1500);
   await client.sendMessage(chatId, media, { caption });
-  await client.sendPresenceUpdate('paused', chatId);
+  await chat.clearState();
 }
 
 async function sendMessage(client, chatId, message, imageUrl = null) {

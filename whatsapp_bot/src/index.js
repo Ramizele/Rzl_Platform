@@ -1,6 +1,10 @@
 require('dotenv').config();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
+const fs = require('fs');
+const path = require('path');
+const { exec } = require('child_process');
 
 const { getPendingRows, getCliente, getMensajes, updateEstado } = require('./sheets');
 const { sendMessage, waitBetweenMessages } = require('./sender');
@@ -99,7 +103,7 @@ async function run(client) {
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   },
 });
@@ -107,6 +111,13 @@ const client = new Client({
 client.on('qr', qr => {
   console.log('Escaneá este QR con WhatsApp:\n');
   qrcode.generate(qr, { small: true });
+  const qrPath = path.join(__dirname, 'qr.png');
+  QRCode.toFile(qrPath, qr, { scale: 8 }, err => {
+    if (!err) {
+      console.log(`\nQR guardado en: ${qrPath}`);
+      exec(`start "" "${qrPath}"`);
+    }
+  });
 });
 
 client.on('authenticated', () => {
@@ -135,3 +146,14 @@ client.on('disconnected', reason => {
 });
 
 client.initialize();
+
+const readline = require('readline');
+readline.emitKeypressEvents(process.stdin);
+if (process.stdin.isTTY) process.stdin.setRawMode(true);
+process.stdin.on('keypress', (str, key) => {
+  if (str === 'q' || (key.ctrl && key.name === 'c')) {
+    console.log('\nSaliendo...');
+    client.destroy().finally(() => process.exit(0));
+  }
+});
+console.log('Presioná "q" para salir en cualquier momento.');
