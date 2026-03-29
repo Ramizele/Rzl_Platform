@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const { getPendingRows, getCliente, getMensajes, updateEstado } = require('./sheets');
+const { getEtiquetaCampana, getClientesByEtiqueta, getMensajes, updateEstadoGest, writeLog } = require('./sheets');
 const { sendMessage, waitBetweenMessages } = require('./sender');
 const { normalizePhone, isValidPhone, replaceName, pickRandom, formatTimestamp } = require('./utils');
 
@@ -14,56 +14,56 @@ const TEST_MODE = process.argv.includes('--test');
 const rowFlagIndex = process.argv.indexOf('--row');
 const TEST_ROW = rowFlagIndex !== -1 ? parseInt(process.argv[rowFlagIndex + 1]) : null;
 
-async function processRow(client, row) {
-  const { rowIndex, cliente, etiqueta, imagen_url } = row;
+async function processRow(client, row, etiqueta) {
+  const { rowIndex, cliente, telefono, nombre_contacto } = row;
+  const fecha_envio = formatTimestamp();
   console.log(`\n[fila ${rowIndex}] ${cliente} | ${etiqueta}`);
 
-  const clienteData = await getCliente(cliente);
-  if (!clienteData) {
-    console.error(`  ERROR: cliente no encontrado en maestro: "${cliente}"`);
-    await updateEstado(rowIndex, 'error', formatTimestamp());
-    return 'error';
-  }
-
-  const phoneNorm = normalizePhone(clienteData.telefono);
+  const phoneNorm = normalizePhone(telefono);
   if (!isValidPhone(phoneNorm)) {
-    console.error(`  ERROR: teléfono inválido: "${clienteData.telefono}" → "${phoneNorm}"`);
-    await updateEstado(rowIndex, 'error', formatTimestamp());
-    return 'error';
+    const detalle_error = `teléfono inválido: "${telefono}" → "${phoneNorm}"`;
+    console.error(`  ERROR: ${detalle_error}`);
+    await updateEstadoGest(rowIndex, 'error', fecha_envio);
+    return { fecha_envio, cliente, telefono: phoneNorm, etiqueta, mensaje_enviado: '', estado: 'error', detalle_error };
   }
 
   const mensajes = await getMensajes(etiqueta);
   if (!mensajes.length) {
-    console.error(`  ERROR: sin templates para etiqueta: "${etiqueta}"`);
-    await updateEstado(rowIndex, 'error', formatTimestamp());
-    return 'error';
+    const detalle_error = `sin templates para etiqueta: "${etiqueta}"`;
+    console.error(`  ERROR: ${detalle_error}`);
+    await updateEstadoGest(rowIndex, 'error', fecha_envio);
+    return { fecha_envio, cliente, telefono: phoneNorm, etiqueta, mensaje_enviado: '', estado: 'error', detalle_error };
   }
 
   const templateRaw = pickRandom(mensajes);
-  const message = replaceName(templateRaw, clienteData.nombre_contacto);
+  const message = replaceName(templateRaw, nombre_contacto);
   const chatId = `${phoneNorm}@c.us`;
 
-  const nombreDisplay = clienteData.nombre_contacto || '(sin nombre)';
-  console.log(`  → ${clienteData.cliente} / ${nombreDisplay} | ${phoneNorm}`);
+  console.log(`  → ${cliente} | ${phoneNorm}`);
   console.log(`  → Msg: ${message.slice(0, 60)}${message.length > 60 ? '...' : ''}`);
 
   try {
-    await sendMessage(client, chatId, message, imagen_url || null);
-    await updateEstado(rowIndex, 'enviado', formatTimestamp());
+    await sendMessage(client, chatId, message, null);
+    await updateEstadoGest(rowIndex, 'enviado', fecha_envio);
     console.log('  ✓ Enviado');
-    return 'enviado';
+    return { fecha_envio, cliente, telefono: phoneNorm, etiqueta, mensaje_enviado: message, estado: 'enviado', detalle_error: '' };
   } catch (err) {
     console.error(`  ERROR al enviar: ${err.message}`);
-    await updateEstado(rowIndex, 'error', formatTimestamp());
-    return 'error';
+    await updateEstadoGest(rowIndex, 'error', fecha_envio);
+    return { fecha_envio, cliente, telefono: phoneNorm, etiqueta, mensaje_enviado: message, estado: 'error', detalle_error: err.message };
   }
 }
 
 async function run(client) {
-  let rows = await getPendingRows();
+  const etiqueta = await getEtiquetaCampana();
+  if (!etiqueta) {
+    console.log('No hay etiqueta definida en campañas.');
+    return;
+  }
 
+  let rows = await getClientesByEtiqueta(etiqueta);
   if (!rows.length) {
-    console.log('No hay filas pendientes en campañas.');
+    console.log(`No hay clientes con etiqueta "${etiqueta}".`);
     return;
   }
 
@@ -71,7 +71,7 @@ async function run(client) {
     if (TEST_ROW) {
       rows = rows.filter(r => r.rowIndex === TEST_ROW);
       if (!rows.length) {
-        console.log(`Modo test: fila ${TEST_ROW} no encontrada o no está pendiente.`);
+        console.log(`Modo test: fila ${TEST_ROW} no encontrada para etiqueta "${etiqueta}".`);
         return;
       }
     } else {
@@ -82,22 +82,26 @@ async function run(client) {
 
   // Aleatorizar orden de envío
   rows.sort(() => Math.random() - 0.5);
-  console.log(`Procesando ${rows.length} fila(s) pendiente(s)...`);
+  console.log(`Procesando ${rows.length} fila(s) con etiqueta "${etiqueta}"...`);
 
-  const counts = { enviado: 0, error: 0 };
+  const resultados = [];
 
   for (let i = 0; i < rows.length; i++) {
-    const result = await processRow(client, rows[i]);
-    counts[result] = (counts[result] || 0) + 1;
+    const result = await processRow(client, rows[i], etiqueta);
+    resultados.push(result);
 
     if (i < rows.length - 1) {
       await waitBetweenMessages();
     }
   }
 
+  await writeLog(resultados);
+
+  const enviados = resultados.filter(r => r.estado === 'enviado').length;
+  const errores = resultados.filter(r => r.estado === 'error').length;
   console.log('\n=== Resumen ===');
-  console.log(`Enviados : ${counts.enviado || 0}`);
-  console.log(`Errores  : ${counts.error || 0}`);
+  console.log(`Enviados : ${enviados}`);
+  console.log(`Errores  : ${errores}`);
 }
 
 const client = new Client({

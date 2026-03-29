@@ -13,25 +13,41 @@ async function getSheets() {
   return google.sheets({ version: 'v4', auth });
 }
 
-async function getPendingRows() {
+async function getEtiquetaCampana() {
+  const sheets = await getSheets();
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'campañas!A2',
+  });
+  const val = (res.data.values?.[0]?.[0] || '').trim();
+  return val || null;
+}
+
+async function getClientesByEtiqueta(etiqueta) {
   const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'campañas!A:E',
+    range: 'gest!A:U',
   });
 
   const rows = response.data.values || [];
   if (rows.length < 2) return [];
 
-  // Fila 0 = header, filas 1+ = datos; rowIndex es 1-based en Sheets (header=1)
-  return rows.slice(1).map((row, i) => ({
-    rowIndex: i + 2,
-    cliente: (row[0] || '').trim(),
-    etiqueta: (row[1] || '').trim(),
-    imagen_url: (row[2] || '').trim(),
-    estado: (row[3] || '').trim(),
-    fecha_envio: (row[4] || '').trim(),
-  })).filter(row => row.estado === 'pendiente' && row.cliente);
+  // Fila 0 = header, filas 1+ = datos; rowIndex 1-based (header=1, datos desde 2)
+  return rows.slice(1)
+    .map((row, i) => ({ row, rowIndex: i + 2 }))
+    .filter(({ row }) => {
+      const cliente = (row[0] || '').trim();
+      const telefono = (row[17] || '').trim();
+      const etiq = (row[18] || '').trim();
+      return cliente && telefono && etiq === etiqueta;
+    })
+    .map(({ row, rowIndex }) => ({
+      rowIndex,
+      cliente: (row[0] || '').trim(),
+      telefono: (row[17] || '').trim(),
+      nombre_contacto: '',
+    }));
 }
 
 async function getCliente(nombre) {
@@ -66,16 +82,45 @@ async function getMensajes(etiqueta) {
   return [found[1], found[2], found[3]].filter(Boolean).filter(m => m.trim());
 }
 
-async function updateEstado(rowIndex, estado, fechaEnvio) {
+async function updateEstadoGest(rowIndex, estado, fechaEnvio) {
   const sheets = await getSheets();
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `campañas!D${rowIndex}:E${rowIndex}`,
+    range: `gest!T${rowIndex}:U${rowIndex}`,
     valueInputOption: 'RAW',
     requestBody: {
-      values: [[estado, fechaEnvio]],
+      values: [[fechaEnvio, estado]],
     },
   });
 }
 
-module.exports = { getPendingRows, getCliente, getMensajes, updateEstado };
+async function writeLog(rows) {
+  const sheets = await getSheets();
+
+  await sheets.spreadsheets.values.clear({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'log!A:G',
+  });
+
+  const header = ['fecha_envio', 'cliente', 'telefono', 'etiqueta', 'mensaje_enviado', 'estado', 'detalle_error'];
+  const data = rows.map(r => [
+    r.fecha_envio,
+    r.cliente,
+    r.telefono,
+    r.etiqueta,
+    r.mensaje_enviado,
+    r.estado,
+    r.detalle_error || '',
+  ]);
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'log!A1',
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [header, ...data],
+    },
+  });
+}
+
+module.exports = { getEtiquetaCampana, getClientesByEtiqueta, getCliente, getMensajes, updateEstadoGest, writeLog };
