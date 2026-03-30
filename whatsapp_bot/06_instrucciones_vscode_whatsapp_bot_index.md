@@ -1,11 +1,20 @@
-require('dotenv').config();
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
-const QRCode = require('qrcode');
-const fs = require('fs');
-const path = require('path');
-const { exec } = require('child_process');
+# Instrucciones para Claude (VS Code) — whatsapp_bot — Paso 2: index.js
 
+Pegá este bloque completo como mensaje en Claude dentro de VS Code, después de haber aplicado los cambios de sheets.js.
+
+---
+
+<!-- ============================================================ -->
+<!-- PEGAR DESDE AQUÍ                                             -->
+<!-- ============================================================ -->
+
+Ahora modificá **index.js** del proyecto whatsapp_bot. El archivo ya existe y funciona — solo aplicar los cambios que se detallan abajo. No tocar `sender.js`, `utils.js`, ni ningún otro archivo.
+
+## Cambios en el import
+
+Reemplazar la línea de require de sheets.js por:
+
+```javascript
 const {
   getModoYEtiqueta,
   getMensajes,
@@ -16,13 +25,14 @@ const {
   writeLog,
   writeLogUniverso,
 } = require('./sheets');
-const { sendMessage, waitBetweenMessages } = require('./sender');
-const { normalizePhone, isValidPhone, replaceName, pickRandom, formatTimestamp } = require('./utils');
+```
 
-const TEST_MODE = process.argv.includes('--test');
-const rowFlagIndex = process.argv.indexOf('--row');
-const TEST_ROW = rowFlagIndex !== -1 ? parseInt(process.argv[rowFlagIndex + 1]) : null;
+## Cambios en processRow
 
+La firma cambia para recibir `modo` como cuarto parámetro.
+Internamente usa `updateEstadoGest` o `updateEstadoUniverso` según el modo.
+
+```javascript
 async function processRow(client, row, etiqueta, modo) {
   const { rowIndex, cliente, telefono, nombre_contacto } = row;
   const fecha_envio = formatTimestamp();
@@ -64,7 +74,13 @@ async function processRow(client, row, etiqueta, modo) {
     return { fecha_envio, cliente, telefono: phoneNorm, etiqueta, mensaje_enviado: message, estado: 'error', detalle_error: err.message };
   }
 }
+```
 
+## Cambios en run()
+
+Reemplazar la función `run` completa por:
+
+```javascript
 async function run(client) {
   const { modo, etiqueta } = await getModoYEtiqueta();
   console.log(`\nModo    : ${modo}`);
@@ -119,61 +135,14 @@ async function run(client) {
   console.log(`Enviados : ${enviados}`);
   console.log(`Errores  : ${errores}`);
 }
+```
 
-const client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: false,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  },
-});
+## Reglas
 
-client.on('qr', qr => {
-  console.log('Escaneá este QR con WhatsApp:\n');
-  qrcode.generate(qr, { small: true });
-  const qrPath = path.join(__dirname, 'qr.png');
-  QRCode.toFile(qrPath, qr, { scale: 8 }, err => {
-    if (!err) {
-      console.log(`\nQR guardado en: ${qrPath}`);
-      exec(`start "" "${qrPath}"`);
-    }
-  });
-});
+- No tocar nada más del archivo — el resto de index.js (inicialización del cliente, QR, eventos, readline) queda exactamente igual
+- El modo test (`--test` y `--row`) sigue funcionando igual que antes
+- Código completo y funcional, sin TODOs ni placeholders
 
-client.on('authenticated', () => {
-  console.log('WhatsApp autenticado.');
-});
-
-client.on('auth_failure', msg => {
-  console.error('Fallo de autenticación:', msg);
-  process.exit(1);
-});
-
-client.on('ready', async () => {
-  console.log('Cliente WhatsApp listo.\n');
-  try {
-    await run(client);
-  } catch (err) {
-    console.error('Error fatal:', err);
-  } finally {
-    console.log('\nListo. Podés cerrar esta terminal.');
-  }
-});
-
-client.on('disconnected', reason => {
-  console.log('Cliente desconectado:', reason);
-  process.exit(0);
-});
-
-client.initialize();
-
-const readline = require('readline');
-readline.emitKeypressEvents(process.stdin);
-if (process.stdin.isTTY) process.stdin.setRawMode(true);
-process.stdin.on('keypress', (str, key) => {
-  if (str === 'q' || (key.ctrl && key.name === 'c')) {
-    console.log('\nSaliendo...');
-    client.destroy().finally(() => process.exit(0));
-  }
-});
-console.log('Presioná "q" para salir en cualquier momento.');
+<!-- ============================================================ -->
+<!-- PEGAR HASTA AQUÍ                                             -->
+<!-- ============================================================ -->
