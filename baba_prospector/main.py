@@ -14,8 +14,12 @@ from config import config
 from handlers.audio_handler import handle_audio
 from handlers.text_handler import handle_text
 
+# Force UTF-8 on Windows consoles (cp1252 can't encode emojis)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 logging.basicConfig(
-    format="%(asctime)s  %(levelname)-8s  %(name)s — %(message)s",
+    format="%(asctime)s  %(levelname)-8s  %(name)s - %(message)s",
     level=logging.INFO,
     stream=sys.stdout,
 )
