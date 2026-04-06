@@ -19,7 +19,7 @@ from telegram.ext import ContextTypes
 
 from config import config
 from handlers import session
-from services import extractor, transcriber
+from services import extractor, transcriber, vendedores
 from utils.formatter import build_summary
 
 logger = logging.getLogger(__name__)
@@ -30,6 +30,12 @@ async def handle_audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     voice = update.message.voice or update.message.audio
 
     if not voice:
+        return
+
+    # Vendedor registration gate
+    if vendedores.get_vendedor(user_id) is None:
+        session.set_pending_action(user_id, "registro_vendedor", config.fields)
+        await update.message.reply_text("👋 ¡Hola! Antes de empezar, ¿cuál es tu nombre?")
         return
 
     # ── Download ───────────────────────────────────────────────────────────

@@ -18,7 +18,7 @@ from telegram.ext import ContextTypes
 
 from config import config
 from handlers import session
-from services import extractor, sheets
+from services import extractor, sheets, vendedores
 from utils.formatter import build_final_summary, build_summary
 
 logger = logging.getLogger(__name__)
@@ -65,6 +65,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text_lower == "/lista":
         await _cmd_lista(update)
+        return
+
+    # Vendedor registration gate
+    if vendedores.get_vendedor(user_id) is None:
+        pending = session.get_pending_action(user_id)
+        if pending == "registro_vendedor":
+            nombre = text.strip()
+            vendedores.save_vendedor(user_id, nombre)
+            session.clear_pending_action(user_id)
+            await update.message.reply_text(
+                f"✅ Registrado como *{nombre}*. ¡Ahora sí, mandame info del primer bar!",
+                parse_mode="Markdown",
+            )
+            return
+        session.set_pending_action(user_id, "registro_vendedor", config.fields)
+        await update.message.reply_text("👋 ¡Hola! Antes de empezar, ¿cuál es tu nombre?")
         return
 
     # Close-bar commands

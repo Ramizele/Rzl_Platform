@@ -10,6 +10,8 @@ sessions[user_id] = {
 
 from typing import Any
 
+from services import vendedores
+
 # Module-level store — lives for the duration of the process
 sessions: dict[int, dict] = {}
 
@@ -21,8 +23,10 @@ def _empty_bar(fields: list[dict]) -> dict[str, Any]:
 
 def get_or_create(user_id: int, fields: list[dict]) -> dict:
     if user_id not in sessions:
+        bar = _empty_bar(fields)
+        bar["vendedor"] = vendedores.get_vendedor(user_id)
         sessions[user_id] = {
-            "bar": _empty_bar(fields),
+            "bar": bar,
             "audio_count": 0,
             "pending_action": None,
         }
@@ -40,6 +44,9 @@ def merge(user_id: int, extracted: dict[str, Any], fields: list[dict]) -> dict:
     """
     session = get_or_create(user_id, fields)
     bar = session["bar"]
+
+    if bar.get("vendedor") is None:
+        bar["vendedor"] = vendedores.get_vendedor(user_id)
 
     for key, value in extracted.items():
         if value is None:

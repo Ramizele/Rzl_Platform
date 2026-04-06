@@ -195,6 +195,13 @@ fields:
     auto: true
     note: "Timestamp Unix al momento de guardar"
 
+  - key: vendedor
+    label: "Vendedor"
+    priority: metadata
+    type: string
+    auto: true
+    note: "Se completa automáticamente según el registro del usuario de Telegram"
+
 # ─────────────────────────────────────────────
 # SEGMENTOS DE BIRRA
 # Para agregar una marca nueva: agregala a la lista correspondiente
