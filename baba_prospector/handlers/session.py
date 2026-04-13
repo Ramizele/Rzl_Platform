@@ -2,9 +2,11 @@
 In-memory session state per Telegram user.
 
 sessions[user_id] = {
-    "bar":            {field_key: value | None, ...},  # active bar being captured
-    "audio_count":    int,                              # audios received this bar
-    "pending_action": str | None,                       # e.g. "confirm_segment", "duplicate:7"
+    "bar":              {field_key: value | None, ...},  # active bar being captured
+    "audio_count":      int,                              # audios received this bar
+    "pending_action":   str | None,                       # e.g. "confirm_segment", "duplicate:7"
+    "ruta_activa":      list[dict] | None,                # paradas de la ruta del día
+    "ruta_completadas": list[str],                        # nombres de paradas ya registradas
 }
 """
 
@@ -29,6 +31,8 @@ def get_or_create(user_id: int, fields: list[dict]) -> dict:
             "bar": bar,
             "audio_count": 0,
             "pending_action": None,
+            "ruta_activa": None,
+            "ruta_completadas": [],
         }
     return sessions[user_id]
 
@@ -84,6 +88,8 @@ def close(user_id: int, fields: list[dict]) -> dict:
         "bar": _empty_bar(fields),
         "audio_count": 0,
         "pending_action": None,
+        "ruta_activa": session.get("ruta_activa"),
+        "ruta_completadas": session.get("ruta_completadas", []),
     }
     return bar_snapshot
 
@@ -101,3 +107,41 @@ def get_pending_action(user_id: int) -> str | None:
 def clear_pending_action(user_id: int):
     if user_id in sessions:
         sessions[user_id]["pending_action"] = None
+
+
+# ── Ruta helpers ───────────────────────────────────────────────────────────────
+
+
+def set_ruta(user_id: int, paradas: list[dict], fields: list[dict]):
+    """Guarda la ruta activa del vendedor, resetea completadas."""
+    session = get_or_create(user_id, fields)
+    session["ruta_activa"] = paradas
+    session["ruta_completadas"] = []
+
+
+def get_ruta(user_id: int) -> list[dict] | None:
+    """Devuelve la ruta activa o None."""
+    s = sessions.get(user_id)
+    return s.get("ruta_activa") if s else None
+
+
+def get_ruta_pendientes(user_id: int) -> list[dict]:
+    """Devuelve las paradas que todavía no fueron registradas."""
+    s = sessions.get(user_id)
+    if not s or not s.get("ruta_activa"):
+        return []
+    completadas = set(s.get("ruta_completadas", []))
+    return [p for p in s["ruta_activa"] if p["nombre"] not in completadas]
+
+
+def marcar_parada_completada(user_id: int, nombre_parada: str):
+    """Marca una parada como registrada."""
+    if user_id in sessions:
+        sessions[user_id].setdefault("ruta_completadas", []).append(nombre_parada)
+
+
+def clear_ruta(user_id: int):
+    """Limpia la ruta activa."""
+    if user_id in sessions:
+        sessions[user_id]["ruta_activa"] = None
+        sessions[user_id]["ruta_completadas"] = []

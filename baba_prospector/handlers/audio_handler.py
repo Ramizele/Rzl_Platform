@@ -69,7 +69,8 @@ async def handle_audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ── Extract fields ─────────────────────────────────────────────────────
-    extracted = extractor.extract(text)
+    ruta_paradas = session.get_ruta(user_id)
+    extracted = extractor.extract(text, ruta_paradas=ruta_paradas)
     if not extracted:
         await update.message.reply_text(
             "⚠️ Transcribí el audio pero no pude extraer campos.\n"

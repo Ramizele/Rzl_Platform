@@ -18,8 +18,9 @@ from telegram.ext import ContextTypes
 
 from config import config
 from handlers import session
+from handlers.route_handler import contains_maps_link, handle_route
 from services import extractor, sheets, vendedores
-from utils.formatter import build_final_summary, build_summary
+from utils.formatter import _escape_md, build_final_summary, build_summary
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +37,14 @@ Mandame audios desde el bar y yo registro la info.
   /estado — Info capturada del bar actual
   /cancelar — Descartar el bar sin guardar
   /lista — Últimos 5 bares guardados
+  /ruta — Ver paradas de la ruta activa
   /help — Este mensaje
 
 *Para cerrar un bar:*
   Escribí {_close_cmds} cuando termines.
+
+*Ruta del día:*
+  Mandame el link de Google Maps con tus paradas antes de salir.
 """
 
 # ── Main dispatcher ────────────────────────────────────────────────────────────
@@ -49,6 +54,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     text = (update.message.text or "").strip()
     text_lower = text.lower()
+
+    # Maps route link — intercept before any other processing
+    if contains_maps_link(text):
+        await handle_route(update, context)
+        return
 
     # Commands (with or without leading slash)
     if text_lower in ("/start", "/help", "start", "help"):
@@ -65,6 +75,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text_lower == "/lista":
         await _cmd_lista(update)
+        return
+
+    if text_lower == "/ruta":
+        await _cmd_ruta(update, user_id)
         return
 
     # Vendedor registration gate
@@ -101,7 +115,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # Default: treat free text as additional bar info
-    extracted = extractor.extract(text)
+    ruta_paradas = session.get_ruta(user_id)
+    extracted = extractor.extract(text, ruta_paradas=ruta_paradas)
     current_session = session.merge(user_id, extracted, config.fields)
     response = build_summary(current_session)
     await update.message.reply_text(response, parse_mode="Markdown")
@@ -146,6 +161,26 @@ async def _cmd_lista(update: Update):
         if fecha:
             entry += f" ({fecha})"
         lines.append(entry)
+
+    await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
+async def _cmd_ruta(update: Update, user_id: int):
+    ruta = session.get_ruta(user_id)
+    if not ruta:
+        await update.message.reply_text(
+            "No hay ninguna ruta activa. Mandame el link de Google Maps con tus paradas."
+        )
+        return
+
+    pendientes = session.get_ruta_pendientes(user_id)
+    pendientes_nombres = {p["nombre"] for p in pendientes}
+    completadas_count = len(ruta) - len(pendientes)
+
+    lines = [f"🗺️ *Ruta activa — {completadas_count}/{len(ruta)} completadas:*", ""]
+    for parada in ruta:
+        icon = "✅" if parada["nombre"] not in pendientes_nombres else "⏳"
+        lines.append(f"  {icon} {_escape_md(parada['nombre'])}")
 
     await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
 
@@ -200,6 +235,10 @@ async def _save_and_confirm(
             "La sesión sigue abierta — podés intentar de nuevo."
         )
         return
+
+    bar_nombre = bar_data.get("nombre")
+    if bar_nombre:
+        session.marcar_parada_completada(user_id, bar_nombre)
 
     summary = build_final_summary(bar_data)
     session.close(user_id, config.fields)

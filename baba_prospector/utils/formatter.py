@@ -25,8 +25,8 @@ def build_summary(session: dict) -> str:
 
     lines: list[str] = []
     if nombre:
-        lines.append(f"📍 *{nombre}*")
-        loc = " — ".join(filter(None, [direccion, barrio]))
+        lines.append(f"📍 *{_escape_md(nombre)}*")
+        loc = " — ".join(filter(None, [_escape_md(direccion) if direccion else None, _escape_md(barrio) if barrio else None]))
         if loc:
             lines.append(f"📌 {loc}")
         lines.append("")
@@ -78,7 +78,7 @@ def build_summary(session: dict) -> str:
     comentarios = bar.get("comentarios")
     if comentarios:
         lines.append("💬 *Notas extra:*")
-        lines.append(f'  "{comentarios}"')
+        lines.append(f'  "{_escape_md(comentarios)}"')
         lines.append("")
 
     # ── Segment confirmation ───────────────────────────────────────────────
@@ -87,9 +87,9 @@ def build_summary(session: dict) -> str:
     if seg_inferido and not seg_confirmado:
         seg_label = config.segments.get(seg_inferido, {}).get("label", seg_inferido)
         birras = bar.get("birras_actuales_marcas")
-        lines.append(f"🍺 Inferí segmento *{seg_label}*")
+        lines.append(f"🍺 Inferí segmento *{_escape_md(str(seg_label))}*")
         if birras:
-            lines.append(f"  (marcas: {birras})")
+            lines.append(f"  (marcas: {_escape_md(str(birras))})")
         lines.append("¿Es correcto? *(sí / no / [segmento correcto])*")
         return "\n".join(lines).strip()
 
@@ -108,7 +108,7 @@ def build_final_summary(bar: dict[str, Any]) -> str:
     Shows all captured fields and flags remaining gaps.
     """
     nombre = bar.get("nombre") or "Bar sin nombre"
-    lines = [f"✅ *Bar guardado: {nombre}*", ""]
+    lines = [f"✅ *Bar guardado: {_escape_md(nombre)}*", ""]
 
     # All non-metadata fields in YAML order
     display_fields = [f for f in config.fields if f["priority"] not in ("metadata",)]
@@ -135,10 +135,17 @@ def build_final_summary(bar: dict[str, Any]) -> str:
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 
+def _escape_md(text: str) -> str:
+    """Escape characters special to Telegram legacy Markdown (parse_mode='Markdown')."""
+    for ch in ("_", "*", "`", "["):
+        text = text.replace(ch, f"\\{ch}")
+    return text
+
+
 def _fmt(value: Any) -> str:
     if isinstance(value, bool):
         return "Sí" if value else "No"
-    return str(value)
+    return _escape_md(str(value))
 
 
 def _next_question(

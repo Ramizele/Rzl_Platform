@@ -22,7 +22,7 @@ _client = Groq(api_key=config.groq_api_key)
 _LLM_MODEL = "llama-3.3-70b-versatile"
 
 
-def extract(transcription: str) -> dict:
+def extract(transcription: str, ruta_paradas: list[dict] | None = None) -> dict:
     """
     Extract structured bar fields from transcription text.
     Returns an empty dict on unrecoverable failure (logged as error).
@@ -30,7 +30,7 @@ def extract(transcription: str) -> dict:
     if not transcription or not transcription.strip():
         return {}
 
-    prompt = build_extraction_prompt(transcription)
+    prompt = build_extraction_prompt(transcription, ruta_paradas=ruta_paradas)
 
     for attempt in range(2):
         try:

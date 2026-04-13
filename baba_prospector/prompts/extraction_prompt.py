@@ -10,18 +10,23 @@ import json
 from config import config
 
 
-def build_extraction_prompt(transcription: str) -> str:
-    return (
-        _HEADER
-        + _build_aliases_section()
-        + "\n\n"
-        + _build_segments_section()
-        + "\n\n"
-        + "JSON a completar:\n"
-        + _build_json_schema()
-        + "\n\nTexto transcripto:\n"
-        + f'"{transcription}"'
-    )
+def build_extraction_prompt(
+    transcription: str, ruta_paradas: list[dict] | None = None
+) -> str:
+    parts = [
+        _HEADER,
+        _build_aliases_section(),
+        "\n\n",
+        _build_segments_section(),
+    ]
+    if ruta_paradas:
+        parts.append("\n\n")
+        parts.append(_build_ruta_section(ruta_paradas))
+    parts.append("\n\nJSON a completar:\n")
+    parts.append(_build_json_schema())
+    parts.append("\n\nTexto transcripto:\n")
+    parts.append(f'"{transcription}"')
+    return "".join(parts)
 
 
 # ── Static header ──────────────────────────────────────────────────────────────
@@ -67,6 +72,23 @@ def _build_segments_section() -> str:
         lines.append(f"  {seg_key} ({seg_data['label']}): {brand_str}")
     lines.append("  → Si hay marcas de más de un segmento → segmento_inferido: \"mixto\"")
     lines.append("  → Si no se mencionan marcas → segmento_inferido: null")
+    return "\n".join(lines)
+
+
+def _build_ruta_section(paradas: list[dict]) -> str:
+    lines = [
+        "Ruta activa del vendedor — paradas disponibles:",
+        "Si el vendedor menciona uno de estos lugares (por nombre completo, apodo o referencia parcial),",
+        "identificá cuál es y completá nombre, direccion y barrio automáticamente con los valores exactos de abajo.",
+        "Si no hay referencia clara a ninguna parada, dejá esos campos en null.",
+        "",
+    ]
+    for i, p in enumerate(paradas, 1):
+        lines.append(
+            f'  {i}. nombre: "{p["nombre"]}" | '
+            f'direccion: "{p.get("direccion", "")}" | '
+            f'barrio: "{p.get("barrio", "")}"'
+        )
     return "\n".join(lines)
 
 

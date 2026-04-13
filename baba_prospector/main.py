@@ -40,6 +40,7 @@ def main():
     app.add_handler(CommandHandler("estado", handle_text))
     app.add_handler(CommandHandler("cancelar", handle_text))
     app.add_handler(CommandHandler("lista", handle_text))
+    app.add_handler(CommandHandler("ruta", handle_text))
 
     # Plain text (bar info + close commands + confirmations)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
