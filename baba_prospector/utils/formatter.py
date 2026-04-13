@@ -160,15 +160,22 @@ def _next_question(
     - 'hibrido': ask only for missing clave fields
     - 'pasivo':  never ask
     - Paired fields (same ask_priority): skip if any sibling is already captured
+    - solo_nombre_requerido (TEMPORARIO): only ask actively for nombre
     """
     if behavior == "pasivo":
         return None
+
+    solo_nombre = config.bot.get("solo_nombre_requerido", False)
 
     for field in priority_fields:
         if bar.get(field["key"]) is not None:
             continue
 
         priority = field["priority"]
+
+        if solo_nombre and field["key"] != "nombre":
+            continue
+
         if behavior == "hibrido" and priority != "clave":
             continue
 

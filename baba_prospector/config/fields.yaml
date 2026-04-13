@@ -270,3 +270,4 @@ bot:
   behavior: "activo"                        # activo | pasivo | hibrido
   max_question_per_response: 1              # nunca más de una pregunta por respuesta
   sheets_tab: "bares_prospectos"            # nombre exacto de la hoja en Sheets
+  solo_nombre_requerido: true               # TEMPORARIO: bajar a false cuando ruta esté andando
