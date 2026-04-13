@@ -9,6 +9,9 @@ from typing import Any
 
 from config import config
 
+# Campos que se manejan por flujo propio — no mostrar como faltantes ni preguntar
+_SEGMENT_KEYS = {"segmento_inferido", "segmento_confirmado"}
+
 
 def build_summary(session: dict) -> str:
     """
@@ -59,7 +62,9 @@ def build_summary(session: dict) -> str:
     ]
     missing_rec = [
         f for f in priority_fields
-        if f["priority"] == "recomendado" and bar.get(f["key"]) is None
+        if f["priority"] == "recomendado"
+        and bar.get(f["key"]) is None
+        and f["key"] not in _SEGMENT_KEYS
     ]
 
     if missing_clave:
@@ -169,6 +174,10 @@ def _next_question(
 
     for field in priority_fields:
         if bar.get(field["key"]) is not None:
+            continue
+
+        # Campos de segmento nunca se preguntan activamente — tienen su propio flujo
+        if field["key"] in _SEGMENT_KEYS:
             continue
 
         priority = field["priority"]
